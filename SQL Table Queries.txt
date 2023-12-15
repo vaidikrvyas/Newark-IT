@@ -1,0 +1,125 @@
+DROP TABLE IF EXISTS silver_and_above;
+CREATE TABLE silver_and_above (
+    CID INT NOT NULL,
+    CreditLine DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY(CID),
+    FOREIGN KEY (CID) REFERENCES customer(CID)
+);
+
+DROP TABLE IF EXISTS customer;
+CREATE TABLE customer (
+    CID INT NOT NULL,
+    FName VARCHAR(255) NOT NULL,
+    LName VARCHAR(255) NOT NULL,
+    EMail VARCHAR(255) NOT NULL,
+    Address VARCHAR(255) NOT NULL,
+    Phone VARCHAR(15) NOT NULL,
+    Status VARCHAR(50) NOT NULL,
+    PRIMARY KEY(CID)
+);
+
+DROP TABLE IF EXISTS credit_card;
+CREATE TABLE credit_card (
+    CCNumber VARCHAR(255),
+    SecNumber VARCHAR(255) NOT NULL,
+    OwnerName VARCHAR(255) NOT NULL,
+    CCType VARCHAR(255) NOT NULL,
+    BilAddress VARCHAR(255) NOT NULL,
+    ExpDate DATE NOT NULL,
+    StoredCardCID INT NOT NULL,
+	PRIMARY KEY(CCNumber),
+    FOREIGN KEY (StoredCardCID) REFERENCES customer(CID)
+);
+
+DROP TABLE IF EXISTS shipping_address;
+CREATE TABLE shipping_address (
+    CID INT,
+    SAName VARCHAR(255),
+    RecipientName VARCHAR(255) NOT NULL,
+    Street VARCHAR(255) NOT NULL,
+    SNumber VARCHAR(10) NOT NULL,
+    City VARCHAR(255) NOT NULL,
+    Zip VARCHAR(20) NOT NULL,
+    State VARCHAR(255) NOT NULL,
+    Country VARCHAR(255) NOT NULL,
+    PRIMARY KEY (CID, SAName),
+    FOREIGN KEY (CID) REFERENCES customer(CID)
+);
+
+DROP TABLE IF EXISTS transaction;
+CREATE TABLE transaction (
+    BID INT,
+    CCNumber VARCHAR(255),
+    CID INT,
+    SAName VARCHAR(255),
+    TDate DATE,
+    TTag VARCHAR(255),
+    PRIMARY KEY (BID, CCNumber, CID, SAName),
+	FOREIGN KEY (CID,SAName) REFERENCES shipping_address(CID,SAName),
+	FOREIGN KEY (CCNumber) REFERENCES credit_card(CCNumber),
+    FOREIGN KEY (BID) REFERENCES basket(BID)
+);
+
+DROP TABLE IF EXISTS basket;
+CREATE TABLE basket (
+    BID INT,
+    CID INT,
+	PRIMARY KEY (BID),
+    FOREIGN KEY (CID) REFERENCES customer(CID)
+);
+
+DROP TABLE IF EXISTS appears_in;
+CREATE TABLE appears_in (
+    BID INT,
+    PID INT,
+    Quantity INT,
+    PriceSold DECIMAL(10, 2),
+    PRIMARY KEY (BID, PID),
+    FOREIGN KEY (BID) REFERENCES basket(BID),
+	FOREIGN KEY (PID) REFERENCES product(PID)
+);
+
+DROP TABLE IF EXISTS offer_product;
+CREATE TABLE offer_product (
+    PID INT,
+    OfferPrice DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY (PID),
+    FOREIGN KEY (PID) REFERENCES product(PID)
+);
+
+DROP TABLE IF EXISTS product;
+CREATE TABLE product (
+    PID INT,
+    PType VARCHAR(255) NOT NULL,
+    PName VARCHAR(255) NOT NULL,
+    PPrice DECIMAL(10, 2) NOT NULL,
+    Description TEXT,
+    PQuantity INT NOT NULL,
+	PRIMARY KEY (PID)
+);
+
+DROP TABLE IF EXISTS computer;
+CREATE TABLE computer (
+    PID INT,
+    CPUType VARCHAR(255) NOT NULL,
+    PRIMARY KEY (PID),
+    FOREIGN KEY (PID) REFERENCES product(PID)
+);
+
+DROP TABLE IF EXISTS printer;
+CREATE TABLE printer (
+    PID INT,
+    PrinterType VARCHAR(255) NOT NULL,
+    Resolution VARCHAR(50) NOT NULL,
+    PRIMARY KEY (PID),
+    FOREIGN KEY (PID) REFERENCES product(PID)
+);
+
+DROP TABLE IF EXISTS laptop;
+CREATE TABLE laptop (
+    PID INT,
+    BType VARCHAR(255) NOT NULL,
+    Weight DECIMAL(5, 2) NOT NULL,
+    PRIMARY KEY (PID),
+    FOREIGN KEY (PID) REFERENCES product(PID)
+);

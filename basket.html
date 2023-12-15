@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Basket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #basket {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #basket table {
+            width: 80%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        #basket th, #basket td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        #basket th {
+            background-color: #f2f2f2;
+        }
+
+        #total {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        #checkout-btn {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Shopping Basket</h1>
+
+<div id="basket">
+    <table>
+        <thead>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody id="basket-items">
+        <!-- Product items will be dynamically added here -->
+        </tbody>
+    </table>
+
+    <div id="total">Total: $0.00</div>
+
+    <button id="checkout-btn" onclick="checkout()">Checkout</button>
+</div>
+
+<script>
+    // Sample products for demonstration
+    const products = [
+        { id: 1, name: 'Product 1', price: 20.00 },
+        { id: 2, name: 'Product 2', price: 15.00 },
+        { id: 3, name: 'Product 3', price: 25.00 }
+    ];
+
+    // Basket to store added items
+    const basket = [];
+
+    // Function to add a product to the basket
+    function addToBasket(productId) {
+        const product = products.find(p => p.id === productId);
+        if (product) {
+            const existingItem = basket.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                basket.push({ ...product, quantity: 1 });
+            }
+
+            updateBasket();
+        }
+    }
+
+    // Function to update the basket view
+    function updateBasket() {
+        const basketItems = document.getElementById('basket-items');
+        const totalElement = document.getElementById('total');
+
+        // Clear previous items
+        basketItems.innerHTML = '';
+
+        let total = 0;
+
+        // Add new items to the basket
+        basket.forEach(item => {
+            const totalForItem = item.price * item.quantity;
+            total += totalForItem;
+
+            const row = `<tr>
+                            <td>${item.name}</td>
+                            <td>$${item.price.toFixed(2)}</td>
+                            <td>${item.quantity}</td>
+                            <td>$${totalForItem.toFixed(2)}</td>
+                        </tr>`;
+            basketItems.innerHTML += row;
+        });
+
+        // Update total
+        totalElement.textContent = `Total: $${total.toFixed(2)}`;
+    }
+
+    // Function to simulate checkout
+    function checkout() {
+        alert('Checkout functionality would be implemented on the server side.');
+        // You would typically send the basket data to the server for processing at this point
+        // and handle the transaction, update inventory, etc.
+        // For this example, we'll just clear the basket.
+        basket.length = 0;
+        updateBasket();
+    }
+
+    // Sample: Adding some products to the basket on page load
+    addToBasket(1);
+    addToBasket(2);
+    addToBasket(1);
+</script>
+
+</body>
+</html>

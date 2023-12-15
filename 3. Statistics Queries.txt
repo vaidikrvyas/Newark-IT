@@ -1,0 +1,104 @@
+1. Compute the total amount charged per credit card.
+
+SELECT 
+    c.CCNumber, 
+    SUM(o.PriceSold) AS total_amount
+FROM 
+    credit_card c
+JOIN 
+    basket b ON c.StoredCardCID = b.CID
+JOIN 
+    appears_in o ON b.BID = o.BID
+GROUP BY 
+    c.CCNumber;
+
+2. Compute the 10 best customers (in terms of money spent) in descending order.
+
+SELECT 
+    c.CID, 
+    c.FName, 
+    c.LName, 
+    SUM(o.PriceSold) AS total_spent
+FROM 
+    customer c
+JOIN 
+    basket b ON c.CID = b.CID
+JOIN 
+    appears_in o ON b.BID = o.BID
+GROUP BY 
+    c.CID, c.FName, c.LName
+ORDER BY 
+    total_spent DESC
+LIMIT 10;
+
+
+3. For a given time period (begin date and end date) compute the most frequently sold products.
+
+SELECT 
+    a.PID, 
+    p.PName, 
+    COUNT(a.PID)
+FROM 
+    transaction t, basket b, appears_in a, product p
+WHERE 
+    t.BID = b.BID AND a.BID = b.BID AND p.PID = a.PID AND (t.Tdate BETWEEN '2022-01-01' AND '2025-01-01')
+GROUP BY 
+    p.Pname, a.PID
+ORDER BY 
+    COUNT(a.PID) DESC;
+
+
+4. For a given time period (begin date and end date) compute the products which are sold to the
+highest number of distinct customers.
+
+SELECT 
+    a.PID, 
+    p.PName, 
+    COUNT(DISTINCT t.CID) AS NumberofCustomer
+FROM 
+    transaction t, basket b, appears_in a, product p
+WHERE 
+    t.BID = b.BID AND a.BID = b.BID AND p.PID = a.PID AND (t.Tdate BETWEEN '2022-01-01' AND '2025-01-01')
+GROUP BY 
+    p.Pname, a.PID
+ORDER BY 
+    NumberofCustomer DESC;
+
+
+5. For a given time period (begin date and end date) compute the maximum basket total amount
+per credit card.
+
+SELECT 
+    subquery.CCNumber, 
+    MAX(subquery.totalAmount) AS MaxBasketTotalAmount
+FROM 
+    (SELECT 
+        t.CCNumber, 
+        SUM(a.PriceSold * a.Quantity) AS totalAmount
+    FROM 
+        transaction t
+    JOIN 
+        basket b ON t.BID = b.BID
+    JOIN 
+        appears_in a ON a.BID = b.BID
+    WHERE 
+        t.TDate BETWEEN '2022-10-10' AND '2024-10-10'
+    GROUP BY 
+        t.CCNumber, b.BID) AS subquery
+GROUP BY 
+    subquery.CCNumber;
+
+
+
+6. For a given time period (begin date and end date) compute the average selling product price
+per product type (desktop, laptop, and printer).
+
+SELECT 
+    p.PType, 
+    AVG(a.PriceSold)
+FROM 
+    transaction t, basket b, appears_in a, product p
+WHERE 
+    t.BID = b.BID AND a.BID = b.BID AND p.PID = a.PID AND (t.Tdate BETWEEN '2022-01-01' AND '2025-01-01')
+GROUP BY 
+    p.PType;
